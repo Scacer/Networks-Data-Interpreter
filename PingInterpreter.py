@@ -23,9 +23,9 @@ class PingInterpreter:
         for file in os.listdir(directory):   
             filename = os.fsdecode(file)
 
-            if filename.endswith(".log"):
-                self.__processFile(filename)
-            else:
+            if filename.endswith(".log"): # if a log file is found, process it
+                self.__processFile(filename) 
+            else: # if a non-log file is found, keep track of it with a message in self.processMessage
                 self.processMessages.append("File with name: \"" + filename + "\" was found, but not identified as a log file.")
                 self.processMessages.append("!--> Ensure all log files have filenames ending in \".log\"")
         
@@ -53,11 +53,11 @@ class PingInterpreter:
                 elif counter % 2 == 1:
                     localData.append(curLine[-30:-28]) # Extract the packet loss data from the first line
                 elif counter % 2 == 0:
-                    text = (curLine.removeprefix("rtt min/avg/max/mdev = ")[:-4]).split('/')
-                    for field in text:
+                    text = (curLine.removeprefix("rtt min/avg/max/mdev = ")[:-4]).split('/') # Extract the rtt data from the second line
+                    for field in text: # place all of the rtt data in the localData array
                         localData.append(field)
-                    packagedData = self.__packageData(localData, filename, day)
-                    self.pingData.append(packagedData)
+                    packagedData = self.__packageData(localData, filename, day) # send localData to be packaged, returning the packaged data
+                    self.pingData.append(packagedData) # add the packaged data to self.pingData array
                     localData = [] # reset local data
                     day += 1 # increment number of days elapsed
                     
@@ -76,7 +76,6 @@ class PingInterpreter:
         # Add each datapoint from the data argument to the entry
         for dataPoint in data:
             dataArray.append(dataPoint)
-        print(dataArray)
         # Return the data entry, to be added to self.pingData elsewhere
         return dataArray 
     
