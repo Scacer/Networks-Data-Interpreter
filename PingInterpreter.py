@@ -5,7 +5,7 @@ class PingInterpreter:
     
 # Attributes
     pingData = [] # Will hold the final data to be written to a file
-    processLogs = [] # Will hold any messages to be output into a log
+    processMessages = [] # Will hold any messages to be output into a log
 
 # Constructors
 
@@ -17,7 +17,7 @@ class PingInterpreter:
         self.outputName = filename
 
 # Service Methods
-    def processLogs(self):
+    def processData(self):
         directory = os.fsencode(self.filepath)
 
         for file in os.listdir(directory):   
@@ -26,8 +26,10 @@ class PingInterpreter:
             if filename.endswith(".log"):
                 self.__processFile(filename)
             else:
-                self.processLogs.append("File with name: \"" + filename + "\" was found, but not identified as a log file.")
-                self.processLogs.append("!--> Ensure all log files have filenames ending in \".log\"")
+                self.processMessages.append("File with name: \"" + filename + "\" was found, but not identified as a log file.")
+                self.processMessages.append("!--> Ensure all log files have filenames ending in \".log\"")
+        
+        self.__writeData() # Once data has been collected, write it to output files
     
 # Support Methods
     # processFile
@@ -76,17 +78,28 @@ class PingInterpreter:
             dataArray.append(dataPoint)
         print(dataArray)
         # Return the data entry, to be added to self.pingData elsewhere
-        return dataArray
+        return dataArray 
     
     # writeData
     #   - Writes data held in self.pingData to an output file, the name of which is determined by self.outputName
-    
+    def __writeData(self):
 
+        with open(self.outputName, "w") as f: # this scope writes self.pingData to an output file
+            for data in self.pingData:
+                f.write(data[0] + ", " + data[1] + ", " + data[2] + ", " + data[3] + ", " + data[4] + ", " + data[5] + ", " + data[6] + "\n")
+        
+        if len(self.processMessages) > 0: # this condition checks for any process messages
+            with open("messages.txt") as f: # this scope writes self.processMessages to an output file
+                for data in self.processMessages:
+                    f.write(data + "\n")
+
+
+       
 
 
 def main():
     myObj = PingInterpreter("D:/Github/Networks-Data-Interpreter/ping/data", datetime.datetime(2025, 5, 1), "test.csv")
-    myObj.processLogs()
+    myObj.processData()
 
 if __name__ == "__main__":
     main()
