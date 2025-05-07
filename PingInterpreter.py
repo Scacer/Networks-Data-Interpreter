@@ -1,0 +1,92 @@
+import os
+import datetime
+
+class PingInterpreter:
+    
+# Attributes
+    pingData = [] # Will hold the final data to be written to a file
+    processLogs = [] # Will hold any messages to be output into a log
+
+# Constructors
+
+    # This constructor takes an argument for filepath, startDate. If left empty, default values are the current working directory, and today's date respectively.
+    def __init__(self, filepath=os.getcwd(), startDate=datetime.datetime.now().date(), filename="output.csv"):
+        self.filepath = filepath
+        self.pingData.append(["Host", "Date", "Time", "Packet Loss", "min", "avg", "max", "mdev"])
+        self.startDate = startDate
+        self.outputName = filename
+
+# Service Methods
+    def processLogs(self):
+        directory = os.fsencode(self.filepath)
+
+        for file in os.listdir(directory):   
+            filename = os.fsdecode(file)
+
+            if filename.endswith(".log"):
+                self.__processFile(filename)
+            else:
+                self.processLogs.append("File with name: \"" + filename + "\" was found, but not identified as a log file.")
+                self.processLogs.append("!--> Ensure all log files have filenames ending in \".log\"")
+    
+# Support Methods
+    # processFile
+    #   - Processes the ping data within a specific file
+    def __processFile(self, filename):
+
+        filepath = self.filepath + "/" + filename
+
+        # counter keeps track of which line we are on
+        counter = 1
+        # day keeps track of how many days have elapsed for each data point
+        day = 0
+        localData = []
+
+        with open(filepath, "r") as f: # Close the file after exiting this scope
+            
+            while(True):
+                curLine = f.readline()
+                if curLine == "": # detect the end of a file
+                    break # breaks the loop where there is no next line
+                elif counter % 2 == 1:
+                    localData.append(curLine[-30:-28]) # Extract the packet loss data from the first line
+                elif counter % 2 == 0:
+                    text = (curLine.removeprefix("rtt min/avg/max/mdev = ")[:-4]).split('/')
+                    for field in text:
+                        localData.append(field)
+                    packagedData = self.__packageData(localData, filename, day)
+                    self.pingData.append(packagedData)
+                    localData = [] # reset local data
+                    day += 1 # increment number of days elapsed
+                    
+
+                counter += 1
+        # Close the file after exiting this scope
+
+    # packageData
+    #   - Packages data into an array appropriate for the headers set in self.pingData during instantiation
+    def __packageData(self, data, filename, day):
+
+        # Prepare semantic information
+        outputDate = (self.startDate + datetime.timedelta(days=day))
+        dataArray = [filename[:-7], str(outputDate.date()), filename[-6:-4] + ":00"]
+
+        # Add each datapoint from the data argument to the entry
+        for dataPoint in data:
+            dataArray.append(dataPoint)
+        print(dataArray)
+        # Return the data entry, to be added to self.pingData elsewhere
+        return dataArray
+    
+    # writeData
+    #   - Writes data held in self.pingData to an output file, the name of which is determined by self.outputName
+    
+
+
+
+def main():
+    myObj = PingInterpreter("D:/Github/Networks-Data-Interpreter/ping/data", datetime.datetime(2025, 5, 1), "test.csv")
+    myObj.processLogs()
+
+if __name__ == "__main__":
+    main()
