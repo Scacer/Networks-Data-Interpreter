@@ -10,8 +10,8 @@ class PingInterpreter:
 # Constructors
 
     # This constructor takes an argument for filepath, startDate. If left empty, default values are the current working directory, and today's date respectively.
-    def __init__(self, filepath=os.getcwd(), startDate=datetime.datetime.now().date(), filename="output.csv"):
-        self.filepath = filepath
+    def __init__(self, directory=os.getcwd(), startDate=datetime.datetime.now().date(), filename="pingOutput.csv"):
+        self.filepath = directory
         self.pingData.append(["Host", "Date", "Time", "Packet Loss", "min", "avg", "max", "mdev"])
         self.startDate = startDate
         self.outputName = filename
