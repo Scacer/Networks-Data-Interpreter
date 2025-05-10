@@ -7,11 +7,19 @@
 
 import datetime
 from PingInterpreter import PingInterpreter
+from TracerouteInterpreter import TracerouteInterpreter
 
 
 def main():
-    myObj = PingInterpreter("D:/Github/Networks-Data-Interpreter/ping/data", datetime.datetime(2025, 5, 1), "test.csv")
-    myObj.processData()
+    #pingObj = PingInterpreter("D:/Github/Networks-Data-Interpreter/ping/data", datetime.datetime(2025, 5, 1), "test.csv")
+    #pingObj.processData()
+
+    trcrtObj = TracerouteInterpreter()
+
+    filepathNames = ["Latvia", "Luxembourg", "NewZealand", "Poland", "SouthAfrica", "Taiwan", "UK", "USA"]
+    for directory in filepathNames:
+        curFilepath = "D:/Github/Networks-Data-Interpreter/traceroute/" + directory
+        trcrtObj.processLogs(curFilepath)
 
 if __name__ == "__main__":
     main()
