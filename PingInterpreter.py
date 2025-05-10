@@ -91,6 +91,8 @@ class PingInterpreter:
             with open("messages.txt") as f: # this scope writes self.processMessages to an output file
                 for data in self.processMessages:
                     f.write(data + "\n")
+            self.processMessages.clear() # prevents duplicate messages being output on secondary call of writeData()
+        
 
 
        
